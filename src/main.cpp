@@ -31,13 +31,34 @@ void reconnectWiFi() {
 
 void setup() {
   Serial.begin(115200);
+  delay(1000);  // Give serial time to initialize
+  Serial.println("\n\n=== ESP32-S3 OLED Clock Starting ===");
 
   // Initialize TFT
+  Serial.println("Initializing TFT display...");
   tft.init();
-  tft.setRotation(1);  // Portrait mode: 320x170
+  Serial.println("TFT init() complete");
+
+  tft.setRotation(1);  // Landscape mode: 170x320 (correct for T-Display-S3)
+  Serial.println("TFT rotation set to 0");
+
   tft.fillScreen(TFT_BLACK);
+  Serial.println("TFT screen filled with black");
+
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.setTextDatum(MC_DATUM);  // Center text
+  Serial.println("TFT text color and datum set");
+
+  // Enable backlight (GPIO38 for T-Display-S3)
+  Serial.print("Setting up backlight on GPIO ");
+  Serial.println(TFT_BL);
+  pinMode(TFT_BL, OUTPUT);
+  digitalWrite(TFT_BL, HIGH);
+  Serial.println("Backlight enabled");
+
+  // Test display with simple message
+  tft.drawString("Initializing...", 160, 85, 2);
+  Serial.println("Test message drawn to display");
 
   // Connect to WiFi
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -52,6 +73,7 @@ void setup() {
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println(" FAILED!");
+    tft.fillScreen(TFT_BLACK);
     tft.drawString("WiFi connection failed", 160, 85, 2);
     return;
   }
@@ -75,6 +97,7 @@ void setup() {
 
   if (retryCount >= maxRetries) {
     Serial.println("Failed to obtain time after all retries");
+    tft.fillScreen(TFT_BLACK);
     tft.drawString("Time sync failed", 160, 85, 2);  // Fallback message
     return;
   }
@@ -82,9 +105,9 @@ void setup() {
   Serial.print(retryCount);
   Serial.println(" attempts!");
 
-  // Enable backlight (GPIO15 for T-Display-S3)
-  pinMode(TFT_BL, OUTPUT);
-  digitalWrite(TFT_BL, HIGH);
+  // Clear screen for clock display
+  tft.fillScreen(TFT_BLACK);
+  Serial.println("Setup complete - ready to display time");
 }
 
 void loop() {
@@ -116,6 +139,9 @@ void loop() {
       strcpy(lastMinute, currentMinute);
       strcpy(lastTimeString, timeString);
       lastUpdateTime = millis();
+
+      Serial.print("Updating display with time: ");
+      Serial.println(timeString);
 
       // Use font 8 for maximum size (75px height) - largest possible font
       // Font 8 character width is approximately 45px per digit
@@ -160,7 +186,7 @@ void loop() {
           strcpy(lastErrorString, "Time sync error");
           lastErrorUpdate = millis();
           tft.startWrite();
-          tft.fillRect(0, 70, 320, 30, TFT_BLACK);
+          tft.fillRect(0, 140, 170, 30, TFT_BLACK);
           tft.drawString("Time sync error", 160, 85, 2);
           tft.endWrite();
           Serial.println("Max time sync retries reached");
@@ -174,7 +200,7 @@ void loop() {
         strcpy(lastErrorString, "No WiFi");
         lastErrorUpdate = millis();
         tft.startWrite();
-        tft.fillRect(0, 70, 320, 30, TFT_BLACK);
+        tft.fillRect(0, 140, 170, 30, TFT_BLACK);
         tft.drawString("No WiFi", 160, 85, 2);
         tft.endWrite();
       }
