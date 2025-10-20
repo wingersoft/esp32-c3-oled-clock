@@ -2,6 +2,8 @@
 #include <WiFi.h>
 #include <time.h>
 #include <TFT_eSPI.h>  // Graphics and font library for ST7789 driver chip
+#include "User_Setup_Select.h"
+#include "User_Setup.h"
 #include "config.h"   // Demo configuration file (copy to config.h with your settings)
 
 // Configuration is now handled in config.h file
@@ -134,6 +136,22 @@ void loop() {
 
     static char lastMinute[3] = "";
 
+    // Color cycling configuration
+    static uint16_t colorIndex = 0;
+    static unsigned long lastColorChange = 0;
+    const uint16_t colors[] = {TFT_WHITE, TFT_RED, TFT_GREEN, TFT_BLUE, TFT_YELLOW, TFT_CYAN, TFT_MAGENTA};
+    const int numColors = 7;
+
+    // Change color based on configuration
+    if (COLOR_CLOCK) {
+      if (millis() - lastColorChange > COLOR_CLOCK_INTERVAL) {
+        colorIndex = (colorIndex + 1) % numColors;
+        lastColorChange = millis();
+        Serial.print("Color changed to index: ");
+        Serial.println(colorIndex);
+      }
+    }
+
     // Only update when minute changes (not every second)
     if (strcmp(currentMinute, lastMinute) != 0) {
       strcpy(lastMinute, currentMinute);
@@ -156,8 +174,9 @@ void loop() {
       // Clear only the exact text area
       tft.fillRect(x, y, textWidth, textHeight, TFT_BLACK);
 
-      // Set text color for better contrast
-      tft.setTextColor(TFT_WHITE, TFT_BLACK);
+      // Set text color with current color from cycling palette (or white if disabled)
+      uint16_t textColor = COLOR_CLOCK ? colors[colorIndex] : TFT_WHITE;
+      tft.setTextColor(textColor, TFT_BLACK);
 
       // Draw time centered (font 8: ~75px height - maximum size)
       tft.drawString(timeString, 160, 85, 8);
