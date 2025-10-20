@@ -45,10 +45,10 @@ pip install -g platformio
 Copy the demo configuration and update with your settings:
 ```bash
 # Copy the demo file to create your personal config
-cp demo-config.h src/config.h
+cp demo-config.h config.h
 
 # Edit the new config file with your WiFi credentials
-nano src/config.h
+nano config.h
 ```
 
 Update the values in `src/config.h`:
@@ -106,12 +106,12 @@ The display is optimized for the LilyGo T-Display S3 with:
 ## Troubleshooting
 
 ### Display Shows "No WiFi"
-- Check WiFi credentials in `src/config.h` (make sure you copied from demo-config.h)
+- Check WiFi credentials in `config.h` (make sure you copied from demo-config.h)
 - Ensure your WiFi network is 2.4GHz (ESP32-S3 WiFi limitation)
 - Verify the board is in range of your WiFi router
 
 ### Missing config.h File
-- Copy `demo-config.h` to `src/config.h`
+- Copy `demo-config.h` to `config.h`
 - Edit the new config.h file with your actual WiFi credentials
 
 ### Display Shows "Time sync error"
@@ -164,8 +164,8 @@ The display is optimized for the LilyGo T-Display S3 with:
 esp32-c3-oled-clock/
 ├── src/
 │   ├── main.cpp          # Main application code
-│   ├── demo-config.h     # Template configuration file (safe to share)
 │   └── config.h          # Your personal config (not in git - add your WiFi credentials)
+├── demo-config.h         # Template configuration file (safe to share)
 ├── .pio/                 # PlatformIO build files (auto-generated)
 ├── platformio.ini        # Project configuration
 ├── README.md            # This file
