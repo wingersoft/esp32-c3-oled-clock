@@ -11,14 +11,16 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 // NTP Server configuration
 const char* NTP_SERVER = "pool.ntp.org";
 
-// Timezone configuration (offset in seconds)
+// Timezone configuration (POSIX timezone string for auto DST)
 // Examples:
-// UTC+1 (Central Europe): 3600
-// UTC+2 (Eastern Europe): 7200
-// UTC-5 (Eastern US): -18000
-// UTC-8 (Pacific US): -28800
-const long GMT_OFFSET_SEC = 3600;  // UTC+1 (change this for your timezone)
-const int DAYLIGHT_OFFSET_SEC = 3600;  // DST offset (1 hour, set to 0 if not using DST)
+// Europe/Berlin: "CET-1CEST,M3.5.0/02:00:00,M10.5.0/03:00:00"
+// London: "GMT0BST,M3.5.0/01:00:00,M10.5.0/02:00:00"
+// US Eastern: "EST5EDT,M3.2.0/02:00:00,M11.1.0/02:00:00"
+const char* TZ_INFO = "CET-1CEST,M3.5.0/02:00:00,M10.5.0/03:00:00";  // Europe/Berlin (auto DST)
+
+// Legacy timezone config (kept for compatibility, not used with auto DST)
+// const long GMT_OFFSET_SEC = 3600;  // UTC+1 (change this for your timezone)
+// const int DAYLIGHT_OFFSET_SEC = 3600;  // DST offset
 
 // TFT Display configuration for LilyGO T-Display-S3
 #define TFT_BL 38  // Backlight pin (GPIO38 for T-Display-S3)
